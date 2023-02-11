@@ -2,13 +2,15 @@ import { BusInstance, Workflow, WorkflowMapper } from '@node-ts/bus-core'
 import { BasicWorkflowState } from './basic-workflow-state'
 import { ProductPurchased, PaymentProcessed, ProductShipped, ProcessPayment, ShipProduct } from '../messages'
 import * as uuid from 'uuid'
-import { injectable } from 'inversify'
+import { injectable, inject } from 'inversify'
+import { SHARED_SYMBOLS } from '../symbols'
 
 @injectable()
 export class BasicWorkflow extends Workflow<BasicWorkflowState> {
 
   constructor (
-    private readonly bus: BusInstance
+    private readonly bus: BusInstance,
+    @inject(SHARED_SYMBOLS.doneCallback) private readonly done: () => void
   ) {
     super()
   }
@@ -47,6 +49,7 @@ export class BasicWorkflow extends Workflow<BasicWorkflowState> {
 
   complete () {
     console.log('product shipped, completing workflow')
+    this.done()
     return this.completeWorkflow()
   }
 }

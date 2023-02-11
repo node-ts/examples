@@ -6,9 +6,9 @@ import { ProductPurchased } from './messages'
 import { ProcessPaymentHandler, ShipProductHandler } from './handlers'
 import { InMemoryPersistence } from '@node-ts/bus-core/dist/workflow/persistence'
 import { Container, decorate, injectable } from 'inversify'
+import { SHARED_SYMBOLS } from './symbols'
 
-const run = async () => {
-
+const run = new Promise<void>(async resolve => {
   let bus: BusInstance
 
   const container = new Container()
@@ -16,8 +16,8 @@ const run = async () => {
   container.bind(BasicWorkflow).toSelf()
   container.bind(ProcessPaymentHandler).toSelf()
   container.bind(ShipProductHandler).toSelf()
-
   container.bind(BusInstance).toDynamicValue(() => bus)
+  container.bind(SHARED_SYMBOLS.doneCallback).toConstantValue(resolve)
   
   bus = await Bus.configure()
     .withWorkflow(BasicWorkflow)
@@ -32,8 +32,7 @@ const run = async () => {
     .initialize()
 
   await bus.start()
-  console.log('publishing event')
   await bus.publish(new ProductPurchased())
-}
+})
 
-run()
+run.then(() => console.log('workflow complete'))
