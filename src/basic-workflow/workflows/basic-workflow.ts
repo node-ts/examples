@@ -2,7 +2,9 @@ import { BusInstance, Workflow, WorkflowMapper } from '@node-ts/bus-core'
 import { BasicWorkflowState } from './basic-workflow-state'
 import { ProductPurchased, PaymentProcessed, ProductShipped, ProcessPayment, ShipProduct } from '../messages'
 import * as uuid from 'uuid'
+import { injectable } from 'inversify'
 
+@injectable()
 export class BasicWorkflow extends Workflow<BasicWorkflowState> {
 
   constructor (
@@ -22,6 +24,7 @@ export class BasicWorkflow extends Workflow<BasicWorkflowState> {
   }
 
   async processPayment (event: ProductPurchased) {
+    console.log('product purchased, processing payment', { event })
     const processPayment = new ProcessPayment(
       uuid.v4()
     )
@@ -32,6 +35,7 @@ export class BasicWorkflow extends Workflow<BasicWorkflowState> {
   }
 
   async shipProduct (event: PaymentProcessed) {
+    console.log('payment processed, shipping product', { event })
     const shipProduct = new ShipProduct(
       uuid.v4()
     )
@@ -42,6 +46,7 @@ export class BasicWorkflow extends Workflow<BasicWorkflowState> {
   }
 
   complete () {
+    console.log('product shipped, completing workflow')
     return this.completeWorkflow()
   }
 }
