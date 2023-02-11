@@ -7,5 +7,6 @@ export class ShipProduct extends Command {
   constructor (
     readonly shipmentId: string
   ) {
+    super()
   }
 }

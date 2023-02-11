@@ -1,9 +1,15 @@
-import { Workflow, WorkflowMapper } from '@node-ts/bus-core'
+import { BusInstance, Workflow, WorkflowMapper } from '@node-ts/bus-core'
 import { BasicWorkflowState } from './basic-workflow-state'
-import { ProductPurchased, PaymentProcessed, ProductShipped, ProcessPayment, ShipProduct } from './messages'
+import { ProductPurchased, PaymentProcessed, ProductShipped, ProcessPayment, ShipProduct } from '../messages'
 import * as uuid from 'uuid'
 
 export class BasicWorkflow extends Workflow<BasicWorkflowState> {
+
+  constructor (
+    private readonly bus: BusInstance
+  ) {
+    super()
+  }
 
   configureWorkflow(
     mapper: WorkflowMapper<BasicWorkflowState, any>
